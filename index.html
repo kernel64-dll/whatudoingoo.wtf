@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>victor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.globe.min.js"></script>
+
+  <link rel="stylesheet" href="../styles.css" />
+  <script src="../main.js" defer></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'minecraftregular', monospace;
+      color: white;
+      background: black;
+      overflow: hidden;
+    }
+
+    #vanta-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    canvas#bgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 10;
+      cursor: pointer;
+      text-align: center;
+      transition: opacity 1s ease-out;
+    }
+
+    #startImg {
+      width: 180px;
+      height: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 0 18px rgba(59,130,246,0.25);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+    }
+    #startImg:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 28px rgba(147,51,234,0.45), 0 0 28px rgba(59,130,246,0.45);
+    }
+
+    #mainContent {
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1s ease-in;
+      overflow: auto;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    #mainContent.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mcbold {
+      font-family: 'minecraftbold';
+    }
+
+    #volumeContainer {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      visibility: hidden;   
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    #volumeButton {
+      background: none;
+      border: 2px solid #3b82f6;
+      color: #3b82f6;
+      font-size: 18px;
+      border-radius: 50%;
+      width: 46px;
+      height: 46px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: box-shadow 0.25s ease, transform 0.12s ease;
+    }
+
+    #volumeButton:hover {
+      box-shadow: 0 0 10px #3b82f6, 0 0 20px #9333ea;
+      transform: translateY(-1px);
+    }
+
+    #volumeSlider {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 140px;
+      height: 8px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #3b82f6, #9333ea);
+      outline: none;
+      box-shadow: 0 0 14px rgba(59,130,246,0.25);
+      transform-origin: center;
+      opacity: 0;
+      transform: scaleY(0.8) translateY(6px);
+      transition: opacity 0.28s ease, transform 0.28s ease;
+    }
+
+    #volumeSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 18px rgba(59,130,246,0.9), 0 0 28px rgba(147,51,234,0.8);
+      border: 2px solid rgba(255,255,255,0.6);
+      cursor: pointer;
+    }
+
+    #volumeSlider.visible {
+      opacity: 1;
+      transform: scaleY(1) translateY(0);
+      box-shadow: 0 0 20px rgba(59,130,246,0.35), 0 0 30px rgba(147,51,234,0.25);
+    }
+  </style>
+</head>
+<body>
+  </head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cixot</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="discord">
+    <meta name="robots" content="noindex, nofollow">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://oofer.lat">
+    <meta property="og:title" content="oofer">
+    <meta property="og:description" content="website made by kernel <3">
+    <meta property="og:image" content="https://oofer.lat/images/azure.webp">
+</head>
+<div id="vanta-bg"></div>
+<canvas id="bgCanvas"></canvas>
+
+<div id="overlay" onclick="startExperience()">
+  <img id="startImg" src="cement.png" alt="click to start">
+  <audio id="introAudio" preload="auto"></audio>
+</div>
+
+<div id="mainContent">
+   <p id="songName" style="margin-top: 30px; font-size: 1.2em; opacity: 0.8;"></p>
+  <center>
+    <div id="content" class="centered">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <img src="cement.png" height="131" width="136" alt="pfp">
+      </div>
+
+      <h1 class="mcbold">whatudoingoo</h1>
+
+      <div style="font-size: 48px;">
+        <p>hi im whatudoingoo</p>
+        <li>very interested in</li>
+        <li>ultrakill pizza tower, hollow knight, silksong, undertale deltarune</li>
+        <li class="mcbold">i eat cement :P</li>
+      </div>
+
+
+
+
+      <h2 id="dropdown-header1">Friends!</h2>
+      <div class="dropdown-container">
+        <div class="dropdown-btns1">
+          <button onclick="buttonClick('https://aubree.lat')" class="button">aubree</button>
+          <button onclick="buttonClick('https://oofer.lat')" class="button">oofer</button>
+        </div>
+      </div>
+    </div>
+    <p>website by aubree.lat</p>
+  </center>
+</div>
+<script>
+  let started = false;
+
+  function startExperience() {
+    if (started) return;
+    started = true;
+
+    const overlay = document.getElementById("overlay");
+    const main = document.getElementById("mainContent");
+    const volumeContainer = document.getElementById("volumeContainer");
+    const volumeButton = document.getElementById("volumeButton");
+    const volumeSlider = document.getElementById("volumeSlider");
+    const audioEl = document.getElementById("introAudio");
+    const songNameEl = document.getElementById("songName");
+
+    
+    const songs = [
+      "../music/tvgirl.mp3",
+    ]; 
+
+    function sillyRandomSong() {
+      const randomSong = songs[Math.floor(Math.random() * songs.length)];
+      audioEl.src = randomSong;
+      songNameEl.textContent = "Now playing: " + randomSong.split("/").pop();
+      audioEl.play().catch(() => {});
+    }
+    sillyRandomSong();
+
+  
+    audioEl.addEventListener("ended", sillyRandomSong);
+
+    audioEl.volume = 0.15;
+
+
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const stars = Array.from({ length: 200 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.5,
+      twinkle: Math.random() * 100
+    }));
+    const shootingStars = [];
+
+    function drawStars() {
+      requestAnimationFrame(drawStars);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const s of stars) {
+        const opacity = 0.5 + Math.sin((s.twinkle += 0.02)) * 0.3;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${opacity})`;
+        ctx.fill();
+      }
+
+      if (Math.random() < 0.005) {
+        shootingStars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height / 2,
+          dx: -3 - Math.random() * 2,
+          dy: 2 + Math.random() * 1,
+          len: 60 + Math.random() * 30
+        });
+      }
+
+      for (let i = shootingStars.length - 1; i >= 0; i--) {
+        const s = shootingStars[i];
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(s.x + s.len, s.y - s.len);
+        ctx.stroke();
+        s.x += s.dx;
+        s.y += s.dy;
+        s.len *= 0.98;
+        if (s.x + s.len < 0 || s.y > canvas.height) shootingStars.splice(i, 1);
+      }
+    }
+
+    drawStars();
+
+    overlay.style.opacity = 0;
+    setTimeout(() => {
+      overlay.style.display = "none";
+      main.classList.add("visible");
+      document.body.style.overflow = "auto";
+
+      volumeContainer.style.visibility = "visible";
+      volumeContainer.style.opacity = 1;
+      volumeContainer.style.pointerEvents = "auto";
+    }, 900);
+
+    volumeSlider.addEventListener("input", () => {
+      audioEl.volume = parseFloat(volumeSlider.value);
+    });
+
+    volumeButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      volumeSlider.classList.toggle("visible");
+    });
+  }
+
+  window.addEventListener("resize", () => {
+    const canvas = document.getElementById("bgCanvas");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  VANTA.GLOBE({
+    el: "#vanta-bg",
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: false,
+    minHeight: 200.0,
+    minWidth: 200.0,
+    scale: 1.0,
+    scaleMobile: 1.0,
+  color: 0xffd13f,
+  color2: 0x3aff,
+  backgroundColor: 0x0
+  });
+</script>
+
+</body>
+</html>
+
+
+
+
