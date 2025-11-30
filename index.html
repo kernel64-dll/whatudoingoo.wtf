@@ -220,13 +220,13 @@
 
     
     const songs = [
-      "../music/tvgirl.mp3",
+      "../music/Altars.mp3",
     ]; 
 
     function sillyRandomSong() {
       const randomSong = songs[Math.floor(Math.random() * songs.length)];
       audioEl.src = randomSong;
-      songNameEl.textContent = "Now playing: " + randomSong.split("/").pop();
+      songNameEl.textContent = "website made by aubree.lat";
       audioEl.play().catch(() => {});
     }
     sillyRandomSong();
